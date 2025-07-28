@@ -1,4 +1,4 @@
-from collections import namedtuple,
+from collections import namedtuple
 
 Station = namedtuple("Station", ["fa", "en"])
 

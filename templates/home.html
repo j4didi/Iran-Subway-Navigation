@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8" />
+    <title>مسیریابی مترو</title>
+</head>
+<body>
+    <h1>مسیریابی مترو</h1>
+
+    <form method="post">
+        <label>مبدا:</label>
+        <select name="start" required>
+            {% for station in stations %}
+                <option value="{{ station.fa }}">{{ station.fa }}</option>
+            {% endfor %}
+        </select>
+
+        <label>مقصد:</label>
+        <select name="end" required>
+            {% for station in stations %}
+                <option value="{{ station.fa }}">{{ station.fa }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">یافتن مسیر</button>
+    </form>
+
+    {% if route_info %}
+        <h2>نتیجه مسیر:</h2>
+        <ul>
+            {% for item in route_info %}
+                <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
