@@ -1,37 +1,175 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'fa' else 'ltr' }}">
+
 <head>
-    <meta charset="UTF-8" />
-    <title>مسیریابی مترو</title>
+    <meta charset="UTF-8">
+    <title>{{ 'مسیریابی مترو' if lang == 'fa' else 'Metro Route Finder' }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% if lang == 'fa' %}
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    {% else %}
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% endif %}
+
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Vazirmatn', sans-serif;
+            direction: {{ 'rtl' if lang == 'fa' else 'ltr' }};
+            text-align: {{ 'right' if lang == 'fa' else 'left' }};
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header-bar h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #343a40;
+        }
+        .btn-group-lang .btn {
+            margin-left: 5px;
+        }
+        label {
+            margin-top: 15px;
+        }
+        .btn-primary {
+            width: 100%;
+            margin-top: 20px;
+        }
+        ul {
+            margin-top: 20px;
+        }
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            padding: 6px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+        }
+        .select2-selection__rendered {
+            line-height: 24px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            top: 6px;
+        }
+    </style>
 </head>
 <body>
-    <h1>مسیریابی مترو</h1>
 
+<div class="container">
+
+    <!-- عنوان و دکمه‌های زبان -->
+    <div class="header-bar" dir="ltr">
+        <div class="btn-group-lang">
+            <a href="{{ url_for('home', lang='fa') }}" class="btn btn-outline-secondary {% if lang == 'fa' %}active{% endif %}">FA</a>
+            <a href="{{ url_for('home', lang='en') }}" class="btn btn-outline-secondary {% if lang == 'en' %}active{% endif %}">EN</a>
+        </div>
+    </div>
+    <h1 dir="{{ 'rtl' if lang == 'fa' else 'ltr' }}">
+            {{ 'مسیریابی مترو' if lang == 'fa' else 'Metro Route Finder' }}
+    </h1>
+
+    <!-- فرم -->
     <form method="post">
-        <label>مبدا:</label>
-        <select name="start" required>
-            {% for station in stations %}
-                <option value="{{ station.fa }}">{{ station.fa }}</option>
-            {% endfor %}
-        </select>
+        <div class="mb-3">
+            <label for="start" class="form-label">{{ 'مبدا:' if lang == 'fa' else 'From:' }}</label>
+            <select class="form-select select-search" id="start" name="start" required>
+                <option value="" disabled {% if not selected_start %}selected{% endif %}>
+                    {{ 'انتخاب ایستگاه مبدا' if lang == 'fa' else 'Select departure station' }}
+                </option>
+                {% for station in stations %}
+                    <option value="{{ station.fa }}" {% if station.fa == selected_start %}selected{% endif %}>
+                        {{ station.fa if lang == 'fa' else station.en }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
-        <label>مقصد:</label>
-        <select name="end" required>
-            {% for station in stations %}
-                <option value="{{ station.fa }}">{{ station.fa }}</option>
-            {% endfor %}
-        </select>
+        <div class="mb-3">
+            <label for="end" class="form-label">{{ 'مقصد:' if lang == 'fa' else 'To:' }}</label>
+            <select class="form-select select-search" id="end" name="end" required>
+                <option value="" disabled {% if not selected_end %}selected{% endif %}>
+                    {{ 'انتخاب ایستگاه مقصد' if lang == 'fa' else 'Select destination station' }}
+                </option>
+                {% for station in stations %}
+                    <option value="{{ station.fa }}" {% if station.fa == selected_end %}selected{% endif %}>
+                        {{ station.fa if lang == 'fa' else station.en }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
-        <button type="submit">یافتن مسیر</button>
+        <button type="submit" class="btn btn-primary w-100">
+            {{ 'یافتن مسیر' if lang == 'fa' else 'Find Route' }}
+        </button>
     </form>
 
     {% if route_info %}
-        <h2>نتیجه مسیر:</h2>
-        <ul>
-            {% for item in route_info %}
-                <li>{{ item }}</li>
-            {% endfor %}
-        </ul>
+        <div class="mt-4" dir="{{ 'rtl' if lang == 'fa' else 'ltr' }}">
+
+            <h5>{{ 'مسیر:' if lang == 'fa' else 'Route Result:' }}</h5>
+            <ul class="list-group">
+                {% for item in route_info %}
+                    <li class="list-group-item">{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{% if lang == 'fa' %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/fa.js"></script>
+{% endif %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.select-search').select2({
+            language: "{{ 'fa' if lang == 'fa' else 'en' }}",
+            dir: "{{ 'rtl' if lang == 'fa' else 'ltr' }}",
+            width: '100%',
+            placeholder: "{{ 'انتخاب ایستگاه' if lang == 'fa' else 'Select an station' }}",
+            allowClear: true
+        });
+
+        $('.select-search').on('focus', function () {
+            let select = $(this);
+            if (!select.data('select2').isOpen()) {
+                select.select2('open');
+            }
+        });
+
+        $(document).on('select2:open', () => {
+            setTimeout(() => {
+                let searchInput = document.querySelector('.select2-container--open .select2-search__field');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }, 0);
+        });
+    });
+</script>
+
 </body>
 </html>
